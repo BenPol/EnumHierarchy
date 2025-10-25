@@ -32,7 +32,7 @@ Next define an `EnumHierarchyVariant` using all the structs the hierarchy.
 using AnimalEnum = EnumHierarchyVariant<Animal, Animal::Mammal, Animal::Mammal::Cat, Animal::Mammal::Dog, Animal::Bird, Animal::Bird::Crow, Animal::Bird::Parrot>;
 ```
 Instances of the enum hierarchy variant can be initialised as:
-```
+```cpp
 AnimalEnum animal = Animal{};
 AnimalEnum mammal = Animal::Mammal{};
 AnimalEnum dog = Animal::Mammal::Dog{};
@@ -42,13 +42,40 @@ AnimalEnum crow = Animal::Bird::Crow{};
 AnimalEnum parrot = Animal::Bird::Parrot{};
 ```
 ## Behaviour
-The `==` operator behaves as a (commutative) 'is-a' relation. For example:
+`a.isSameAs(b)` checks for strict equality between two enum hierarchy variants. The `==` operator can also be used to represent this relationship. For example:
+```cpp
+animal.isSameAs(animal);    // true
+animal == animal;           // true
+animal == mammal;           // false
 ```
-mammal == animal;   // true
-animal == mammal;   // true
-mammal == mammal;   // true
-dog    == animal;   // true
-dog    == cat;      // false
-dog    == bird;     // false
-bird   == crow;     // true
+`a.isA(b)` checks if `a` is a descendant or the same type as `b`. The `<=` operator can also be used to represent this relationship. For example:
+```cpp
+animal.isA(mammal);     // false
+mammal.isA(animal);     // true
+dog <= animal;          // true
+dog <= dog;             // true
+dog <= bird;            // false
 ```
+`a.isDescendantOf(b)` checks if `a` is a descendant of `b`. The `<` operator can also be used to represent this relationship. For example:
+```cpp
+animal.isDescendantOf(mammal);      // false
+mammal.isDescendantOf(animal);      // true
+dog < animal;                       // true
+dog < dog;                          // false
+dog < bird;                         // false
+```
+`a.hasA(b)` checks if `a` is an ancestor or the same type as `b`. The `>=` operator can also be used to represent this relationship. For example:
+```cpp
+bird.hasA(crow);        // true
+bird.hasA(bird);        // true
+bird >= cat;            // false
+animal >= cat;          // true
+```
+`a.isAncestorOf(b)` checks if `a` is an ancestor of `b`. The `>` operator can also be used to represent this relationship. For example:
+```cpp
+bird.isAncestorOf(crow);        // true
+bird.isAncestorOf(bird);        // false
+bird > cat;                     // false
+animal > cat;                   // true
+```
+It should also be noted that ths system only forms a _partial_ ordering. For example `parrot <= mammal` and `mammal <= parrot` are both false.
